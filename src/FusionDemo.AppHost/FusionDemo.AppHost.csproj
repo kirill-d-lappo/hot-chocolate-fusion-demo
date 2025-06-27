@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <IsAspireHost>true</IsAspireHost>
+        <UserSecretsId>c6df76a7-d45e-4a12-be28-a0ce57d37e12</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" />
+        <PackageReference Include="HotChocolate.Fusion.Aspire" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FusionDemo.Gateway\FusionDemo.Gateway.csproj" />
+        <ProjectReference Include="..\FusionDemo.Ordering\FusionDemo.Ordering.csproj" />
+        <ProjectReference Include="..\FusionDemo.Products\FusionDemo.Products.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <!-- Note [2024/12/12 klappo] 1591 - Not all public classes in GQL project might have/need documenation-->
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <GQLSchemaGenOutput>./schema.graphql</GQLSchemaGenOutput>
+        <GQLFusionCompose>true</GQLFusionCompose>
+    </PropertyGroup>
+
+    <Target Name="UpdateGraphqlSchemaTarget" AfterTargets="PostBuildEvent" Condition="'$(GQLFusionCompose)' != ''">
+        <PropertyGroup>
+            <GQLFusionComposeCommand0>rm gateway.fgp</GQLFusionComposeCommand0>
+            <GQLFusionComposeCommand1>fusion compose -p gateway.fgp -s ../FusionDemo.Products</GQLFusionComposeCommand1>
+            <GQLFusionComposeCommand2>fusion compose -p gateway.fgp -s ../FusionDemo.Ordering</GQLFusionComposeCommand2>
+        </PropertyGroup>
+        <Exec IgnoreExitCode="false" ConsoleToMSBuild="true" Command="$(GQLFusionComposeCommand0)">
+            <Output TaskParameter="ConsoleOutput" PropertyName="GQLFusionComposeCommandOutput" />
+            <Output TaskParameter="ExitCode" PropertyName="GQLFusionComposeCommandExitCode" />
+        </Exec>
+        <Exec IgnoreExitCode="false" ConsoleToMSBuild="true" Command="$(GQLFusionComposeCommand1)">
+            <Output TaskParameter="ConsoleOutput" PropertyName="GQLFusionComposeCommandOutput" />
+            <Output TaskParameter="ExitCode" PropertyName="GQLFusionComposeCommandExitCode" />
+        </Exec>
+        <Exec IgnoreExitCode="false" ConsoleToMSBuild="true" Command="$(GQLFusionComposeCommand2)">
+            <Output TaskParameter="ConsoleOutput" PropertyName="GQLFusionComposeCommandOutput" />
+            <Output TaskParameter="ExitCode" PropertyName="GQLFusionComposeCommandExitCode" />
+        </Exec>
+
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="HotChocolate.Fusion" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FusionDemo.ServiceDefaults\FusionDemo.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+</Project>

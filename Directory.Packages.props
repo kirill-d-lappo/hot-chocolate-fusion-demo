@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="9.3.1" />
+    <PackageVersion Include="HotChocolate.Fusion" Version="15.1.7" />
+    <PackageVersion Include="HotChocolate.Fusion.Aspire" Version="15.1.7" />
+    <PackageVersion Include="HotChocolate.Fusion.SourceSchema" Version="15.1.7" />
+    <PackageVersion Include="HotChocolate.AspNetCore" Version="15.1.7" />
+    <PackageVersion Include="HotChocolate.AspNetCore.CommandLine" Version="15.1.7" />
+    <PackageVersion Include="HotChocolate.Types.Analyzers" Version="15.1.7" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.3.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.12.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.12.0" />
+  </ItemGroup>
+</Project>

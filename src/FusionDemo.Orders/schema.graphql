@@ -20,7 +20,7 @@ type Product {
 }
 
 type Query {
-  orders: [Order] @cost(weight: "10")
+  allOrders: [Order] @cost(weight: "10")
 }
 
 "The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response."

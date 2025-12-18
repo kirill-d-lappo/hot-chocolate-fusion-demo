@@ -2,7 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src\FusionDemo.AppHost\FusionDemo.AppHost.csproj" Type="Classic C#" />
     <Project Path="src\FusionDemo.Gateway\FusionDemo.Gateway.csproj" Type="Classic C#" />
-    <Project Path="src\FusionDemo.Ordering\FusionDemo.Ordering.csproj" Type="Classic C#" />
+    <Project Path="src\FusionDemo.Orders\FusionDemo.Orders.csproj" Type="Classic C#" />
     <Project Path="src\FusionDemo.Products\FusionDemo.Products.csproj" Type="Classic C#" />
     <Project Path="src\FusionDemo.ServiceDefaults\FusionDemo.ServiceDefaults.csproj" Type="Classic C#" />
   </Folder>

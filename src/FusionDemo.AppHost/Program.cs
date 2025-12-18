@@ -1,11 +1,13 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var ordering = builder.AddProject<Projects.FusionDemo_Ordering>("ordering");
+var orders = builder.AddProject<Projects.FusionDemo_Orders>("orders");
 var products = builder.AddProject<Projects.FusionDemo_Products>("products");
 
 builder
-    .AddFusionGateway<Projects.FusionDemo_Gateway>("gateway")
-    .WithSubgraph(ordering)
-    .WithSubgraph(products);
+  .AddFusionGateway<Projects.FusionDemo_Gateway>("gateway")
+  .WithSubgraph(orders)
+  .WithSubgraph(products);
 
-builder.Build().Compose().Run();
+builder.Build()
+  .Compose()
+  .Run();

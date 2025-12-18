@@ -15,100 +15,103 @@ namespace Microsoft.Extensions.Hosting;
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
 public static class Extensions
 {
-    public static IHostApplicationBuilder AddServiceDefaults(this IHostApplicationBuilder builder)
+  extension(IHostApplicationBuilder builder)
+  {
+    public IHostApplicationBuilder AddServiceDefaults()
     {
-        builder.ConfigureOpenTelemetry();
+      builder.ConfigureOpenTelemetry();
 
-        builder.AddDefaultHealthChecks();
+      builder.AddDefaultHealthChecks();
 
-        builder.Services.AddServiceDiscovery();
+      builder.Services.AddServiceDiscovery();
 
-        builder.Services.ConfigureHttpClientDefaults(http =>
+      builder.Services.ConfigureHttpClientDefaults(http =>
+      {
+        // Turn on resilience by default
+        http.AddStandardResilienceHandler();
+
+        // Turn on service discovery by default
+        http.AddServiceDiscovery();
+      });
+
+      return builder;
+    }
+
+    public IHostApplicationBuilder ConfigureOpenTelemetry()
+    {
+      builder.Logging.AddOpenTelemetry(logging =>
+      {
+        logging.IncludeFormattedMessage = true;
+        logging.IncludeScopes = true;
+      });
+
+      builder.Services.AddOpenTelemetry()
+        .WithMetrics(metrics =>
         {
-            // Turn on resilience by default
-            http.AddStandardResilienceHandler();
+          metrics.AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation();
+        })
+        .WithTracing(tracing =>
+        {
+          tracing.AddAspNetCoreInstrumentation()
 
-            // Turn on service discovery by default
-            http.AddServiceDiscovery();
+            // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
+            //.AddGrpcClientInstrumentation()
+            .AddHttpClientInstrumentation();
         });
 
-        return builder;
+      builder.AddOpenTelemetryExporters();
+
+      return builder;
     }
 
-    public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
+    private IHostApplicationBuilder AddOpenTelemetryExporters()
     {
-        builder.Logging.AddOpenTelemetry(logging =>
-        {
-            logging.IncludeFormattedMessage = true;
-            logging.IncludeScopes = true;
-        });
+      var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
-        builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
-            })
-            .WithTracing(tracing =>
-            {
-                tracing.AddAspNetCoreInstrumentation()
+      if (useOtlpExporter)
+      {
+        builder.Services.AddOpenTelemetry().UseOtlpExporter();
+      }
 
-                    // Uncomment the following line to enable gRPC instrumentation (requires the OpenTelemetry.Instrumentation.GrpcNetClient package)
-                    //.AddGrpcClientInstrumentation()
-                    .AddHttpClientInstrumentation();
-            });
+      // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
+      //if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+      //{
+      //    builder.Services.AddOpenTelemetry()
+      //       .UseAzureMonitor();
+      //}
 
-        builder.AddOpenTelemetryExporters();
-
-        return builder;
+      return builder;
     }
 
-    private static IHostApplicationBuilder AddOpenTelemetryExporters(this IHostApplicationBuilder builder)
+    public IHostApplicationBuilder AddDefaultHealthChecks()
     {
-        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+      builder.Services.AddHealthChecks()
 
-        if (useOtlpExporter)
-        {
-            builder.Services.AddOpenTelemetry().UseOtlpExporter();
-        }
+        // Add a default liveness check to ensure app is responsive
+        .AddCheck("self", () => HealthCheckResult.Healthy(), ["live",]);
 
-        // Uncomment the following lines to enable the Azure Monitor exporter (requires the Azure.Monitor.OpenTelemetry.AspNetCore package)
-        //if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
-        //{
-        //    builder.Services.AddOpenTelemetry()
-        //       .UseAzureMonitor();
-        //}
-
-        return builder;
+      return builder;
     }
+  }
 
-    public static IHostApplicationBuilder AddDefaultHealthChecks(this IHostApplicationBuilder builder)
+  public static WebApplication MapDefaultEndpoints(this WebApplication app)
+  {
+    // Adding health checks endpoints to applications in non-development environments has security implications.
+    // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
+    if (app.Environment.IsDevelopment())
     {
-        builder.Services.AddHealthChecks()
+      // All health checks must pass for app to be considered ready to accept traffic after starting
+      app.MapHealthChecks("/health");
 
-            // Add a default liveness check to ensure app is responsive
-            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live",]);
-
-        return builder;
+      // Only health checks tagged with the "live" tag must pass for app to be considered alive
+      app.MapHealthChecks("/alive", new HealthCheckOptions
+      {
+        Predicate = r => r.Tags.Contains("live"),
+      });
     }
 
-    public static WebApplication MapDefaultEndpoints(this WebApplication app)
-    {
-        // Adding health checks endpoints to applications in non-development environments has security implications.
-        // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
-        if (app.Environment.IsDevelopment())
-        {
-            // All health checks must pass for app to be considered ready to accept traffic after starting
-            app.MapHealthChecks("/health");
-
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks("/alive", new HealthCheckOptions
-            {
-                Predicate = r => r.Tags.Contains("live"),
-            });
-        }
-
-        return app;
-    }
+    return app;
+  }
 }

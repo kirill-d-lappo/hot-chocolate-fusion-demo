@@ -1,6 +1,7 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddGraphQL().AddFusionDemoProductsTypes();
+builder.AddGraphQL()
+  .AddFusionDemoProductsTypes();
 
 builder.AddServiceDefaults();
 
